@@ -130,7 +130,7 @@ class Appearance_Characters(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     character_id: Mapped[int] = mapped_column(
         ForeignKey('character.id'), nullable=False)
-    character: Mapped[Character] = relationship(back_populates='apperance')
+    character: Mapped[Character] = relationship(back_populates='appearance')
     film_id: Mapped[int] = mapped_column(ForeignKey('film.id'), nullable=False)
     film: Mapped[Film] = relationship(back_populates='feature_char')
 
@@ -140,6 +140,6 @@ class Appearance_Planets(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     planet_id: Mapped[int] = mapped_column(
         ForeignKey('planet.id'), nullable=False)
-    planet: Mapped[Character] = relationship(back_populates='apperance')
+    planet: Mapped[Planet] = relationship(back_populates='appearance')
     film_id: Mapped[int] = mapped_column(ForeignKey('film.id'), nullable=False)
     film: Mapped[Film] = relationship(back_populates='feature_planet')
