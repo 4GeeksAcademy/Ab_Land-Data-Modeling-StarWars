@@ -20,6 +20,9 @@ class User(db.Model):
         back_populates='user', cascade='all, delete-orphan')
     fav_film: Mapped[list['Favorites_Films']] = relationship(
         back_populates='user', cascade='all, delete-orphan')
+    
+    def __str__(self):
+        return f'user: {self.user_name}'
 
 
 class Character(db.Model):
@@ -27,19 +30,22 @@ class Character(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     full_name: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False)
-    birth_year: Mapped[str] = mapped_column(String(10), )
-    gender: Mapped[str] = mapped_column(String(10), )
-    height_mts: Mapped[int] = mapped_column(Integer, )
-    weigth_kg: Mapped[int] = mapped_column(Integer, )
-    skin_tone: Mapped[str] = mapped_column(String(20), )
-    eye_color: Mapped[str] = mapped_column(String(20), )
-    hair_color: Mapped[str] = mapped_column(String(20), )
+    birth_year: Mapped[str] = mapped_column(String(10), nullable=True)
+    gender: Mapped[str] = mapped_column(String(10), nullable=True)
+    height_mts: Mapped[int] = mapped_column(Integer, nullable=True)
+    weigth_kg: Mapped[int] = mapped_column(Integer, nullable=True)
+    skin_tone: Mapped[str] = mapped_column(String(20), nullable=True)
+    eye_color: Mapped[str] = mapped_column(String(20), nullable=True)
+    hair_color: Mapped[str] = mapped_column(String(20), nullable=True)
     favorite_by: Mapped[list['Favorites_Characters']] = relationship(
         back_populates='character', cascade='all, delete-orphan')
     home_planet: Mapped[list['Natives_Planets']] = relationship(
         back_populates='character', cascade='all, delete-orphan')
     appearance: Mapped[list['Appearance_Characters']] = relationship(
         back_populates='character', cascade='all, delete-orphan')
+    
+    def __str__(self):
+        return f'Character: {self.full_name}'
 
 
 class Planet(db.Model):
@@ -47,20 +53,23 @@ class Planet(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False)
-    climate: Mapped[str] = mapped_column(String(20), )
-    terrain: Mapped[str] = mapped_column(String(20), )
-    population_count: Mapped[int] = mapped_column(Integer, )
-    gravity: Mapped[str] = mapped_column(String, )
-    diameter: Mapped[int] = mapped_column(Integer, )
-    water_surface: Mapped[int] = mapped_column(Integer, )
-    orvital_period: Mapped[int] = mapped_column(Integer, )
-    rotation_period: Mapped[int] = mapped_column(Integer, )
+    climate: Mapped[str] = mapped_column(String(20), nullable=True)
+    terrain: Mapped[str] = mapped_column(String(20), nullable=True)
+    population_count: Mapped[int] = mapped_column(Integer, nullable=True)
+    gravity: Mapped[str] = mapped_column(String(20), nullable=True)
+    diameter: Mapped[int] = mapped_column(Integer, nullable=True)
+    water_surface: Mapped[int] = mapped_column(Integer, nullable=True)
+    orvital_period: Mapped[int] = mapped_column(Integer, nullable=True)
+    rotation_period: Mapped[int] = mapped_column(Integer, nullable=True)
     favorite_by: Mapped[list['Favorites_Planets']] = relationship(
         back_populates='planet', cascade='all, delete-orphan')
     natives: Mapped[list['Natives_Planets']] = relationship(
         back_populates='planet', cascade='all, delete-orphan')
     appearance: Mapped[list['Appearance_Planets']] = relationship(
         back_populates='planet', cascade='all, delete-orphan')
+    
+    def __str__(self):
+        return f'Planet: {self.name}'
 
 
 class Film(db.Model):
@@ -68,18 +77,20 @@ class Film(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False)
-    episode: Mapped[str] = mapped_column(String(10), )
-    director: Mapped[str] = mapped_column(String(20), )
-    producer: Mapped[str] = mapped_column(String(20), )
-    release_date: Mapped[int] = mapped_column(Date, )
-    opening_crawl: Mapped[str] = mapped_column(Text, )
+    episode: Mapped[str] = mapped_column(String(10), nullable=False)
+    director: Mapped[str] = mapped_column(String(20), nullable=True)
+    producer: Mapped[str] = mapped_column(String(20), nullable=True)
+    release_date: Mapped[int] = mapped_column(Date, nullable=True)
+    opening_crawl: Mapped[str] = mapped_column(Text, nullable=True)
     favorite_by: Mapped[list['Favorites_Films']] = relationship(
         back_populates='film', cascade='all, delete-orphan')
     feature_char: Mapped[list['Appearance_Characters']] = relationship(
         back_populates='film', cascade='all, delete-orphan')
     feature_planet: Mapped[list['Appearance_Planets']] = relationship(
         back_populates='film', cascade='all, delete-orphan')
-
+    
+    def __str__(self):
+        return f'Episode: {self.episode}'
 
 # favorites
 class Favorites_Characters(db.Model):
@@ -91,6 +102,9 @@ class Favorites_Characters(db.Model):
         ForeignKey('character.id'), nullable=False)
     character: Mapped[Character] = relationship(back_populates='favorite_by')
 
+    def __str__(self):
+        return f'{self.user} likes {self.character}'
+
 
 class Favorites_Planets(db.Model):
     __tablename__ = 'favorite_planets'
@@ -101,6 +115,9 @@ class Favorites_Planets(db.Model):
         ForeignKey('planet.id'), nullable=False)
     planet: Mapped[Planet] = relationship(back_populates='favorite_by')
 
+    def __str__(self):
+        return f'{self.user} likes {self.planet}'
+
 
 class Favorites_Films(db.Model):
     __tablename__ = 'favorite_films'
@@ -110,9 +127,10 @@ class Favorites_Films(db.Model):
     film_id: Mapped[int] = mapped_column(ForeignKey('film.id'), nullable=False)
     film: Mapped[Film] = relationship(back_populates='favorite_by')
 
+    def __str__(self):
+        return f'{self.user} likes {self.film}'
+
 # Natives
-
-
 class Natives_Planets(db.Model):
     __tablename__ = 'natives_planets'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -122,6 +140,9 @@ class Natives_Planets(db.Model):
     planet_id: Mapped[int] = mapped_column(
         ForeignKey('planet.id'), nullable=False)
     planet: Mapped[Planet] = relationship(back_populates='natives')
+
+    def __str__(self):
+        return f'{self.character} lives in {self.planet}'
 
 
 # Appearances
@@ -134,6 +155,9 @@ class Appearance_Characters(db.Model):
     film_id: Mapped[int] = mapped_column(ForeignKey('film.id'), nullable=False)
     film: Mapped[Film] = relationship(back_populates='feature_char')
 
+    def __str__(self):
+        return f'{self.character} appears in {self.film}'
+
 
 class Appearance_Planets(db.Model):
     __tablename__ = 'appearance_planets'
@@ -143,3 +167,6 @@ class Appearance_Planets(db.Model):
     planet: Mapped[Planet] = relationship(back_populates='appearance')
     film_id: Mapped[int] = mapped_column(ForeignKey('film.id'), nullable=False)
     film: Mapped[Film] = relationship(back_populates='feature_planet')
+
+    def __str__(self):
+        return f'{self.planet} appears in {self.film}'
