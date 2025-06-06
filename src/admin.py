@@ -24,7 +24,7 @@ class Planet_MV(ModelView):
 
 class Film_MV(ModelView):
     column_auto_selected = True
-    colum_list = ['id', 'title', 'episode', 'director', 'producer', 'release_date',
+    column_list = ['id', 'title', 'episode', 'director', 'producer', 'release_date',
                   'opening_crawl', 'favorite_by', 'feature_char', 'feature_planet']
 
 
