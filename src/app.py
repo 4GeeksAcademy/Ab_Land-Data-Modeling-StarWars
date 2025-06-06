@@ -89,6 +89,23 @@ def get_planet_by(id):
     if planet is None:
         return jsonify({'msg': 'Planet not found'}), 404
     planet_serialized = planet.serialize()
+   
+    natives = []
+    for native in planet.natives:
+        natives.append(native.character.serialize())
+    planet_serialized['natives'] = natives
+
+    favorite_by = []
+    for favorite in planet.favorite_by:
+        favorite_by.append(favorite.user.serialize())
+    planet_serialized['favorite_by'] = favorite_by    
+
+    appearances = []
+    for appearance in planet.appearance:
+        appearances.append(appearance.film.serialize())
+    planet_serialized['appearances'] = appearances        
+
+
     return jsonify({'mgs': 'ok', 'GETTED':planet_serialized}), 200
 
 @app.route('/films', methods=['GET'])
@@ -191,41 +208,73 @@ def delete_user_by(id):
     db.session.commit()
     return jsonify({'msg':'ok', 'DELETED':f'USER: {user.user_name}'}), 200
 
-@app.route('/user/<int:user_id>/favorites/character/<int:reg_id>',methods=['DELETE'])
-def delete_user_fav_char(user_id,reg_id):
-    user = User.query.get(user_id)
-    if user is None or user.is_active is False:
-        return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
+@app.route('/favorites/character_regid/<int:reg_id>',methods=['DELETE'])
+def delete_user_fav_char(reg_id):    
     favorite = Favorites_Characters.query.get(reg_id)
     if favorite is None:
-        return jsonify({'msg': f'Registre of Favorite_Characters not found'}), 404
-    db.session.delete()
+        return jsonify({'msg': f'Registre of Favorite_Characters: {reg_id} not found'}), 404
+    db.session.delete(favorite)
     db.session.commit()
     return jsonify({'msg':'ok', 'DELETED':f'Registre of favorite {reg_id}'}), 200
 
-@app.route('/user/<int:user_id>/favorites/planet/<int:reg_id>',methods=['DELETE'])
-def delete_user_fav_planet(user_id,reg_id):
-    user = User.query.get(user_id)
-    if user is None or user.is_active is False:
-        return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
-    favorite = Favorites_Planets.query.get(reg_id)
-    if favorite is None:
-        return jsonify({'msg': f'Registre of Favorite_Planets not found'}), 404
-    db.session.delete()
-    db.session.commit()
-    return jsonify({'msg':'ok', 'DELETED':f'Registre of favorite {reg_id}'}), 200
 
-@app.route('/user/<int:user_id>/favorites/film/<int:reg_id>',methods=['DELETE'])
-def delete_user_fav_film(user_id,reg_id):
+
+@app.route('/user/<int:user_id>/favorites/character/<int:id>', methods=['DELETE'])
+def delete_character_by(user_id,id):
     user = User.query.get(user_id)
     if user is None or user.is_active is False:
         return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
-    favorite = Favorites_Films.query.get(reg_id)
-    if favorite is None:
-        return jsonify({'msg': f'Registre of Favorite_Films not found'}), 404
-    db.session.delete()
+    
+    character = Character.query.get(id)
+    if character is None:
+        return jsonify({'msg': f'Character_id:{id}, not found'}), 404
+    
+    fav_char = Favorites_Characters.query.filter_by(user_id=user_id, character_id=id).first()
+    if fav_char is None:
+        return jsonify({'msg': f'Favorite register not found for user_id:{user_id} and character_id:{id}'}), 404
+
+    db.session.delete(fav_char)
     db.session.commit()
-    return jsonify({'msg':'ok', 'DELETED':f'Registre of favorite {reg_id}'}), 200
+
+    return jsonify({'msg': 'Favorite character deleted successfully', 'DELETED': f'reg_id: {fav_char.id}'}), 200
+
+@app.route('/user/<int:user_id>/favorites/planet/<int:id>', methods=['DELETE'])
+def delete_planet_by(user_id,id):
+    user = User.query.get(user_id)
+    if user is None or user.is_active is False:
+        return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
+    
+    planet = Planet.query.get(id)
+    if planet is None:
+        return jsonify({'msg': f'Planet_id:{id}, not found'}), 404
+    
+    fav_planet = Favorites_Planets.query.filter_by(user_id=user_id, planet_id=id).first()
+    if fav_planet is None:
+        return jsonify({'msg': f'Favorite register not found for user_id:{user_id} and planet_id:{id}'}), 404
+
+    db.session.delete(fav_planet)
+    db.session.commit()
+
+    return jsonify({'msg': 'Favorite planet deleted successfully', 'DELETED': f'reg_id: {fav_planet.id}'}), 200
+
+@app.route('/user/<int:user_id>/favorites/film/<int:id>', methods=['DELETE'])
+def delete_film_by(user_id,id):
+    user = User.query.get(user_id)
+    if user is None or user.is_active is False:
+        return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
+    
+    film = film.query.get(id)
+    if film is None:
+        return jsonify({'msg': f'Film_id:{id}, not found'}), 404
+    
+    fav_film = Favorites_Films.query.filter_by(user_id=user_id, film_id=id).first()
+    if fav_film is None:
+        return jsonify({'msg': f'Favorite register not found for user_id:{user_id} and film_id:{id}'}), 404
+
+    db.session.delete(fav_film)
+    db.session.commit()
+
+    return jsonify({'msg': 'Favorite film deleted successfully', 'DELETED': f'reg_id: {fav_film.id}'}), 200
 
 
 # this only runs if `$ python src/app.py` is executed
