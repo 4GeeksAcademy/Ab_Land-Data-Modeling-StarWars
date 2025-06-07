@@ -364,7 +364,6 @@ def post_film():
 
 # PUTs
 
-
 @app.route('/user/<int:id>', methods=['PUT'])
 def put_user_by(id):
     body = request.get_json(silent=True)
@@ -395,9 +394,40 @@ def delete_user_by(id):
     db.session.commit()
     return jsonify({'msg': 'ok', 'DELETED': f'USER: {user.user_name}'}), 200
 
+
+@app.route('/character/<int:id>', methods=['DELETE'])
+def delete_character_by(id):
+    character = Character.query.get(id)
+    if character is None:
+        return jsonify({'msg': f'Character_id:{id}, not found'}), 404
+    db.session.delete(character)
+    db.session.commit()
+    return jsonify({'msg': 'ok', 'DELETED': f'Character: {character.full_name}'}), 200
+
+
+@app.route('/planet/<int:id>', methods=['DELETE'])
+def delete_planet_by(id):
+    planet = Planet.query.get(id)
+    if planet is None:
+        return jsonify({'msg': f'Planet_id:{id}, not found'}), 404
+    db.session.delete(planet)
+    db.session.commit()
+    return jsonify({'msg': 'ok', 'DELETED': f'Planet: {planet.name}'}), 200
+
+
+@app.route('/film/<int:id>', methods=['DELETE'])
+def delete_film_by(id):
+    film = Film.query.get(id)
+    if film is None:
+        return jsonify({'msg': f'Film_id:{id}, not found'}), 404
+
+    db.session.delete(film)
+    db.session.commit()
+    return jsonify({'msg': 'ok', 'DELETE': f'Film: Episode {film.episode}'}), 200
+
+
+# Favorites
 # By_register
-
-
 @app.route('/favorites/character/<int:reg_id>', methods=['DELETE'])
 def delete_user_fav_char(reg_id):
     favorite = Favorites_Characters.query.get(reg_id)
@@ -410,7 +440,7 @@ def delete_user_fav_char(reg_id):
 
 # By_filtering
 @app.route('/user/<int:user_id>/favorites/character/<int:id>', methods=['DELETE'])
-def delete_character_by(user_id, id):
+def delete_favorite_character_by(user_id, id):
     user = User.query.get(user_id)
     if user is None or user.is_active is False:
         return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
@@ -431,7 +461,7 @@ def delete_character_by(user_id, id):
 
 
 @app.route('/user/<int:user_id>/favorites/planet/<int:id>', methods=['DELETE'])
-def delete_planet_by(user_id, id):
+def delete_favorite_planet_by(user_id, id):
     user = User.query.get(user_id)
     if user is None or user.is_active is False:
         return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
@@ -452,7 +482,7 @@ def delete_planet_by(user_id, id):
 
 
 @app.route('/user/<int:user_id>/favorites/film/<int:id>', methods=['DELETE'])
-def delete_film_by(user_id, id):
+def delete_favorite_film_by(user_id, id):
     user = User.query.get(user_id)
     if user is None or user.is_active is False:
         return jsonify({'msg': f'User_id:{user_id}, not found'}), 404
