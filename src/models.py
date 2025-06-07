@@ -40,7 +40,7 @@ class Character(db.Model):
     birth_year: Mapped[str] = mapped_column(String(10), nullable=True)
     gender: Mapped[str] = mapped_column(String(10), nullable=True)
     height_mts: Mapped[int] = mapped_column(Integer, nullable=True)
-    weigth_kg: Mapped[int] = mapped_column(Integer, nullable=True)
+    weight_kg: Mapped[int] = mapped_column(Integer, nullable=True)
     skin_tone: Mapped[str] = mapped_column(String(20), nullable=True)
     eye_color: Mapped[str] = mapped_column(String(20), nullable=True)
     hair_color: Mapped[str] = mapped_column(String(20), nullable=True)
@@ -62,7 +62,7 @@ class Character(db.Model):
             'birth_year': self.birth_year,
             'gender': self.gender,
             'heigth_mts': self.height_mts,
-            'weigth_kg': self.weigth_kg,
+            'weigth_kg': self.weight_kg,
             'skin_tone': self.skin_tone,
             'eye_color': self.eye_color,
             'hair_color': self.hair_color
@@ -80,7 +80,7 @@ class Planet(db.Model):
     gravity: Mapped[str] = mapped_column(String(20), nullable=True)
     diameter: Mapped[int] = mapped_column(Integer, nullable=True)
     water_surface: Mapped[int] = mapped_column(Integer, nullable=True)
-    orvital_period: Mapped[int] = mapped_column(Integer, nullable=True)
+    orbital_period: Mapped[int] = mapped_column(Integer, nullable=True)
     rotation_period: Mapped[int] = mapped_column(Integer, nullable=True)
     favorite_by: Mapped[list['Favorites_Planets']] = relationship(
         back_populates='planet', cascade='all, delete-orphan')
@@ -102,7 +102,7 @@ class Planet(db.Model):
             'gravity': self.gravity,
             'diameter': self.diameter,
             'water_surface': self.water_surface,
-            'orvital_period': self.orvital_period,
+            'orbital_period': self.orbital_period,
             'rotation_period': self.rotation_period
         }
 

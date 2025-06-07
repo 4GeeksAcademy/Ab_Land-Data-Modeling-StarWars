@@ -97,7 +97,7 @@ def get_character_by(id):
 
     home_planet = []
     for home in character.home_planet:
-        home_planet.append(home.planet.serialize())    
+        home_planet.append(home.planet.serialize())
     character_serialized['home_planet'] = home_planet
 
     appearances = []
@@ -276,7 +276,94 @@ def post_favorites_films(user_id, film_id):
     return jsonify({'msg': 'ok', 'POSTED': f'reg_id:{new_fav_film.id}, {new_fav_film}'}), 200
 
 
+@app.route('/character', methods=['POST'])
+def post_character():
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'No body was retrive, add one'}), 400
+
+    new_character = Character()
+
+    required_fields = ['full_name']
+    for field in required_fields:
+        if field not in body:
+            return jsonify({'msg': f'Missing field: {field}, required!'}), 400
+        else:
+            setattr(new_character, field, body[field])
+
+    extra_fields = ['birth_year', 'gender', 'height_mts',
+                    'weight_kg', 'skin_tone', 'eye_color', 'hair_color']
+    fields_missing = []
+    for field in extra_fields:
+        if field in body:
+            setattr(new_character, field, body[field])
+        else:
+            fields_missing.append(field)
+
+    db.session.add(new_character)
+    db.session.commit()
+
+    return jsonify({'msg': 'ok', 'Filds_Missing': fields_missing, 'POSTED': new_character.serialize()}), 200
+
+
+@app.route('/planet', methods=['POST'])
+def post_planet():
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'No body was retrive, add one'}), 400
+
+    new_planet = Planet()
+
+    required_fields = ['name']
+    for field in required_fields:
+        if field not in body:
+            return jsonify({'msg': f'Missing field: {field}, required!'}), 400
+        else:
+            setattr(new_planet, field, body[field])
+
+    extra_fields = ['climate', 'terrain', 'population_count', 'gravity',
+                    'diameter', 'water_surface', 'orbital_period', 'rotation_period']
+    fields_missing = []
+    for field in extra_fields:
+        if field in body:
+            setattr(new_planet, field, body[field])
+        else:
+            fields_missing.append(field)
+    db.session.add(new_planet)
+    db.session.commit()
+
+    return jsonify({'msg': 'ok', 'Filds_Missing': fields_missing, 'POSTED': new_planet.serialize()}), 200
+
+
+@app.route('/film', methods=['POST'])
+def post_film():
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'No body was retrive, add one'}), 400
+
+    new_film = Film()
+
+    required_fields = ['title', 'episode']
+    for field in required_fields:
+        if field not in body:
+            return jsonify({'msg': f'Missing field: {field}, required!'}), 400
+        else:
+            setattr(new_film, field, body[field])
+
+    extra_fields = ['director', 'producer', 'release_date', 'opening_crawl']
+    fields_missing = []
+    for field in extra_fields:
+        if field in body:
+            setattr(new_film, field, body[field])
+        else:
+            fields_missing.append(field)
+    db.session.add(new_film)
+    db.session.commit()
+
+    return jsonify({'msg': 'ok', 'Filds_Missing': fields_missing, 'POSTED': new_film.serialize()}), 200
+
 # PUTs
+
 
 @app.route('/user/<int:id>', methods=['PUT'])
 def put_user_by(id):
@@ -309,6 +396,8 @@ def delete_user_by(id):
     return jsonify({'msg': 'ok', 'DELETED': f'USER: {user.user_name}'}), 200
 
 # By_register
+
+
 @app.route('/favorites/character/<int:reg_id>', methods=['DELETE'])
 def delete_user_fav_char(reg_id):
     favorite = Favorites_Characters.query.get(reg_id)
