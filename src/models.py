@@ -61,8 +61,8 @@ class Character(db.Model):
             'full_name': self.full_name,
             'birth_year': self.birth_year,
             'gender': self.gender,
-            'heigth_mts': self.height_mts,
-            'weigth_kg': self.weight_kg,
+            'height_mts': self.height_mts,
+            'weight_kg': self.weight_kg,
             'skin_tone': self.skin_tone,
             'eye_color': self.eye_color,
             'hair_color': self.hair_color

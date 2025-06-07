@@ -382,6 +382,74 @@ def put_user_by(id):
     updated_user_serialized = user.serialize()
     return jsonify({'msg': 'ok', 'PUT': updated_user_serialized}), 200
 
+@app.route('/character/<int:id>', methods=['PUT'])
+def put_character_by(id):
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'No body was retrive, add one'}), 400
+
+    character = Character.query.get(id)
+    if character is None:
+        return jsonify({'msg': f'Character_id:{id}, not found'}), 404
+
+    fields = ['full_name','birth_year', 'gender', 'height_mts','weight_kg', 'skin_tone', 'eye_color', 'hair_color']
+    fields_not_edited = []
+    for field in fields:        
+        if field in body:
+            setattr(character, field, body[field])
+        else:
+            fields_not_edited.append(field)
+
+    db.session.commit()
+
+    return jsonify({'msg': 'ok', 'Filds_not_edited': fields_not_edited, 'PUT': character.serialize()}), 200
+
+@app.route('/planet/<int:id>', methods=['PUT'])
+def put_planet_by(id):
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'No body was retrive, add one'}), 400
+
+    planet = Planet.query.get(id)
+    if planet is None:
+        return jsonify({'msg': f'planet_id:{id}, not found'}), 404
+
+    fields = ['name','climate', 'terrain', 'population_count', 'gravity','diameter', 'water_surface', 'orbital_period', 'rotation_period']
+    fields_not_edited = []
+    for field in fields:        
+        if field in body:
+            setattr(planet, field, body[field])
+        else:
+            fields_not_edited.append(field)
+
+    db.session.commit()
+
+    return jsonify({'msg': 'ok', 'Filds_not_edited': fields_not_edited, 'PUT': planet.serialize()}), 200
+
+@app.route('/film/<int:id>', methods=['PUT'])
+def put_film_by(id):
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'No body was retrive, add one'}), 400
+
+    film = Film.query.get(id)
+    if film is None:
+        return jsonify({'msg': f'Film_id:{id}, not found'}), 404
+
+    fields = ['title', 'episode','director', 'producer', 'release_date', 'opening_crawl']
+    fields_not_edited = []
+    for field in fields:        
+        if field in body:
+            setattr(film, field, body[field])
+        else:
+            fields_not_edited.append(field)
+
+    db.session.commit()
+
+    return jsonify({'msg': 'ok', 'Filds_not_edited': fields_not_edited, 'PUT': film.serialize()}), 200
+
+
+
 
 # DELETEs
 

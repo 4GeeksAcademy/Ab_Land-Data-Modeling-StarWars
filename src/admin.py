@@ -12,14 +12,14 @@ class User_MV(ModelView):
 
 class Character_MV(ModelView):
     column_auto_selected = True
-    column_list = ['id', 'full_name', 'birth_year', 'gender', 'height_mts', 'weigth_kg',
+    column_list = ['id', 'full_name', 'birth_year', 'gender', 'height_mts', 'weight_kg',
                    'skin_tone', 'eye_color', 'hair_color', 'favorite_by', 'home_planet', 'appearance']
 
 
 class Planet_MV(ModelView):
     column_auto_selected = True
     column_list = ['id', 'name', 'climate', 'terrain', 'population_count', 'gravity', 'diameter',
-                   'water_surface', 'orvital_period', 'rotation_period', 'favorite_by', 'natives', 'appearance']
+                   'water_surface', 'orbital_period', 'rotation_period', 'favorite_by', 'natives', 'appearance']
 
 
 class Film_MV(ModelView):
