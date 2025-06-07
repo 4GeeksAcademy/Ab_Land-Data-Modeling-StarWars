@@ -20,17 +20,15 @@ class User(db.Model):
         back_populates='user', cascade='all, delete-orphan')
     fav_film: Mapped[list['Favorites_Films']] = relationship(
         back_populates='user', cascade='all, delete-orphan')
-    #favorites:fav_char + fav_planet + fav_film
-    
+
     def __str__(self):
         return f'User: {self.user_name}'
-    
+
     def serialize(self):
-        return{
-            'id':self.id,
+        return {
+            'id': self.id,
             'user_name': self.user_name,
-            'email':self.email,
-            #'favorites':self.fav_char.character + self.fav_planet.planet + self.fav_film.film            
+            'email': self.email,
         }
 
 
@@ -52,12 +50,12 @@ class Character(db.Model):
         back_populates='character', cascade='all, delete-orphan')
     appearance: Mapped[list['Appearance_Characters']] = relationship(
         back_populates='character', cascade='all, delete-orphan')
-    
+
     def __str__(self):
         return f'Character: {self.full_name}'
-    
+
     def serialize(self):
-        #favorite_by_list = []
+
         return {
             'id': self.id,
             'full_name': self.full_name,
@@ -67,10 +65,7 @@ class Character(db.Model):
             'weigth_kg': self.weigth_kg,
             'skin_tone': self.skin_tone,
             'eye_color': self.eye_color,
-            'hair_color': self.hair_color,
-            #'favorite_by': favorite_by_list.append(self.favorite_by),
-            #'home_planet': self.home_planet,
-            #'appearance': self.appearance
+            'hair_color': self.hair_color
         }
 
 
@@ -93,24 +88,22 @@ class Planet(db.Model):
         back_populates='planet', cascade='all, delete-orphan')
     appearance: Mapped[list['Appearance_Planets']] = relationship(
         back_populates='planet', cascade='all, delete-orphan')
-    
+
     def __str__(self):
         return f'Planet: {self.name}'
-    
+
     def serialize(self):
-        return{
+        return {
             'id': self.id,
+            'name': self.name,
             'climate':  self.climate,
             'terrain': self.terrain,
             'population_count': self.population_count,
             'gravity': self.gravity,
             'diameter': self.diameter,
             'water_surface': self.water_surface,
-            'orvital_period':self.orvital_period,
-            'rotation_period': self.rotation_period,
-            #'favorite_by': self.favorite_by,
-            #'natives' : self.natives,
-            #'appearance': self.appearance
+            'orvital_period': self.orvital_period,
+            'rotation_period': self.rotation_period
         }
 
 
@@ -130,10 +123,10 @@ class Film(db.Model):
         back_populates='film', cascade='all, delete-orphan')
     feature_planet: Mapped[list['Appearance_Planets']] = relationship(
         back_populates='film', cascade='all, delete-orphan')
-    
+
     def __str__(self):
         return f'Episode: {self.episode}'
-    
+
     def serialize(self):
         return {
             'id': self.id,
@@ -142,13 +135,12 @@ class Film(db.Model):
             'director': self.director,
             'prodicer': self.producer,
             'release_date': self.release_date,
-            'opening_crawl': self.opening_crawl,
-            #'favorite_by': self.favorite_by,
-            #'feature_char': self.feature_char,
-            #'feature_planet': self.feature_planet
+            'opening_crawl': self.opening_crawl
         }
 
 # favorites
+
+
 class Favorites_Characters(db.Model):
     __tablename__ = 'favorite_characters'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -160,15 +152,6 @@ class Favorites_Characters(db.Model):
 
     def __str__(self):
         return f'{self.user} likes {self.character}'
-    
-    def serialize(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            #'user': self.user,
-            'character_id': self.character_id,
-            #'character': self.character
-        }
 
 
 class Favorites_Planets(db.Model):
@@ -182,15 +165,6 @@ class Favorites_Planets(db.Model):
 
     def __str__(self):
         return f'{self.user} likes {self.planet}'
-    
-    def serialized(self):
-        return{
-            'id': self.id,
-            'user_id':self.user_id,
-            'user': self.user,
-            'planet_id': self.planet_id,
-            'planet':self.planet            
-        }
 
 
 class Favorites_Films(db.Model):
@@ -205,6 +179,8 @@ class Favorites_Films(db.Model):
         return f'{self.user} likes {self.film}'
 
 # Natives
+
+
 class Natives_Planets(db.Model):
     __tablename__ = 'natives_planets'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -218,8 +194,9 @@ class Natives_Planets(db.Model):
     def __str__(self):
         return f'{self.character} lives in {self.planet}'
 
-
 # Appearances
+
+
 class Appearance_Characters(db.Model):
     __tablename__ = 'appearance_characters'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
