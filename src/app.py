@@ -228,6 +228,12 @@ def post_favorites_characters(user_id, character_id):
     character = Character.query.get(character_id)
     if character is None:
         return jsonify({'msg': f'Character_id:{character_id}, not found'}), 404
+
+    favorited = Favorites_Characters.query.filter_by(
+        user_id=user_id, character_id=character_id).first()
+    if favorited:
+        return jsonify({'msg': f'Character: {character_id} already favorited'}), 400
+
     new_fav_char = Favorites_Characters()
     new_fav_char.user_id = user_id
     new_fav_char.character_id = character_id
@@ -246,6 +252,11 @@ def post_favorites_planets(user_id, planet_id):
     planet = Planet.query.get(planet_id)
     if planet is None:
         return jsonify({'msg': f'Planet_id: {planet_id}, not found'}), 404
+
+    favorited = Favorites_Planets.query.filter_by(
+        user_id=user_id, planet_id=planet_id).first()
+    if favorited:
+        return jsonify({'msg': f'Planet: {planet_id} already favorited'}), 400
 
     new_fav_planet = Favorites_Planets()
     new_fav_planet.user_id = user_id
@@ -266,6 +277,11 @@ def post_favorites_films(user_id, film_id):
     film = Film.query.get(film_id)
     if film is None:
         return jsonify({'msg': f'film_id:{film_id}, not fount'}), 404
+
+    favorited = Favorites_Films.query.filter_by(
+        user_id=user_id, film_id=film_id).first()
+    if favorited:
+        return jsonify({'msg': f'Film: {film_id} already favorited'}), 400
 
     new_fav_film = Favorites_Films()
     new_fav_film.user_id = user_id
@@ -301,6 +317,20 @@ def post_character():
             fields_missing.append(field)
 
     db.session.add(new_character)
+    
+    if 'home_planet' not in body:
+        fields_missing.append('appearance')
+    elif type(body['home_planet']) is not int:
+        return jsonify({'mgs': 'home_planet must be a planet_id'}), 400
+    
+    if Planet.query.get(body['home_planet']) is None:
+        return jsonify({'mgs': f'planet_id:{body['home_planet']} not found'}), 400
+    else:
+        new_reg_app_planet = Natives_Planets()
+        new_reg_app_planet.character_id = new_character.id
+        new_reg_app_planet.planet_id = body['home_planet']
+        db.session.add(new_reg_app_planet)
+            
     db.session.commit()
 
     return jsonify({'msg': 'ok', 'Filds_Missing': fields_missing, 'POSTED': new_character.serialize()}), 200
@@ -329,6 +359,7 @@ def post_planet():
             setattr(new_planet, field, body[field])
         else:
             fields_missing.append(field)
+
     db.session.add(new_planet)
     db.session.commit()
 
@@ -358,11 +389,38 @@ def post_film():
         else:
             fields_missing.append(field)
     db.session.add(new_film)
+
+    feature_list=['feature_char','feature_planet']
+    for feat in feature_list:
+        if feat not in body:
+            fields_missing.append(feat)
+        elif type(body[feat]) is not list :
+            return jsonify({'mgs': f'{feat} must be a list of ids'}), 400
+
+    for app in body['feature_planet']:
+        if Planet.query.get(app) is None:
+            return jsonify({'msg':f'Planet_id: {app} not found'}), 400
+        else:
+            new_reg = Appearance_Planets()
+            new_reg.planet_id = app
+            new_reg.film_id = new_film.id
+            db.session.add(new_reg)
+    
+    for app in body['feature_char']:
+        if Character.query.get(app) is None:
+            return jsonify({'msg':f'Character_id: {app} not found'}), 400
+        else:
+            new_reg = Appearance_Characters()
+            new_reg.character_id = app
+            new_reg.film_id = new_film.id
+            db.session.add(new_reg)        
+
     db.session.commit()
 
     return jsonify({'msg': 'ok', 'Filds_Missing': fields_missing, 'POSTED': new_film.serialize()}), 200
 
 # PUTs
+
 
 @app.route('/user/<int:id>', methods=['PUT'])
 def put_user_by(id):
@@ -382,6 +440,7 @@ def put_user_by(id):
     updated_user_serialized = user.serialize()
     return jsonify({'msg': 'ok', 'PUT': updated_user_serialized}), 200
 
+
 @app.route('/character/<int:id>', methods=['PUT'])
 def put_character_by(id):
     body = request.get_json(silent=True)
@@ -392,9 +451,10 @@ def put_character_by(id):
     if character is None:
         return jsonify({'msg': f'Character_id:{id}, not found'}), 404
 
-    fields = ['full_name','birth_year', 'gender', 'height_mts','weight_kg', 'skin_tone', 'eye_color', 'hair_color']
+    fields = ['full_name', 'birth_year', 'gender', 'height_mts',
+              'weight_kg', 'skin_tone', 'eye_color', 'hair_color']
     fields_not_edited = []
-    for field in fields:        
+    for field in fields:
         if field in body:
             setattr(character, field, body[field])
         else:
@@ -403,6 +463,7 @@ def put_character_by(id):
     db.session.commit()
 
     return jsonify({'msg': 'ok', 'Filds_not_edited': fields_not_edited, 'PUT': character.serialize()}), 200
+
 
 @app.route('/planet/<int:id>', methods=['PUT'])
 def put_planet_by(id):
@@ -414,9 +475,10 @@ def put_planet_by(id):
     if planet is None:
         return jsonify({'msg': f'planet_id:{id}, not found'}), 404
 
-    fields = ['name','climate', 'terrain', 'population_count', 'gravity','diameter', 'water_surface', 'orbital_period', 'rotation_period']
+    fields = ['name', 'climate', 'terrain', 'population_count', 'gravity',
+              'diameter', 'water_surface', 'orbital_period', 'rotation_period']
     fields_not_edited = []
-    for field in fields:        
+    for field in fields:
         if field in body:
             setattr(planet, field, body[field])
         else:
@@ -425,6 +487,7 @@ def put_planet_by(id):
     db.session.commit()
 
     return jsonify({'msg': 'ok', 'Filds_not_edited': fields_not_edited, 'PUT': planet.serialize()}), 200
+
 
 @app.route('/film/<int:id>', methods=['PUT'])
 def put_film_by(id):
@@ -436,9 +499,10 @@ def put_film_by(id):
     if film is None:
         return jsonify({'msg': f'Film_id:{id}, not found'}), 404
 
-    fields = ['title', 'episode','director', 'producer', 'release_date', 'opening_crawl']
+    fields = ['title', 'episode', 'director',
+              'producer', 'release_date', 'opening_crawl']
     fields_not_edited = []
-    for field in fields:        
+    for field in fields:
         if field in body:
             setattr(film, field, body[field])
         else:
@@ -447,8 +511,6 @@ def put_film_by(id):
     db.session.commit()
 
     return jsonify({'msg': 'ok', 'Filds_not_edited': fields_not_edited, 'PUT': film.serialize()}), 200
-
-
 
 
 # DELETEs
